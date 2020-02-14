@@ -21,3 +21,4 @@ On `Linux`, open the console and run `python3 path_to_cdt2bcd.py`
 
 ## Who gets credit for this?
 - Mario Possamato for cdt2bcd
+- Wheatley/AboodXD for the CRC32 Checksum correction
