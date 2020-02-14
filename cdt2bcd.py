@@ -1,5 +1,7 @@
-import tkinter, os, os.path
+import tkinter, os, os.path, binascii
 from tkinter import filedialog
+
+buffer = []
 
 root = tkinter.Tk()
 root.withdraw()
@@ -47,8 +49,8 @@ with open(cdt_path,'rb') as cdt:
         c = bytes(226)
         d = bytes(1)
         e = bytes(233)
-        f = bytes(28)
-        bcd.write(bytes.fromhex('000000000B000000000000005343444C') + start_y + goal_y + goal_x + time_limit + b + save_year + save_month + save_day + save_hour + save_minute + c + bytes([255]) + course_style + d +course_name + e + object_count + f)
+        f = bytes(40)
+        buffer.append(bytes.hex(bytes.fromhex('000000000B000000000000005343444C') + start_y + goal_y + goal_x + time_limit + b + save_year + save_month + save_day + save_hour + save_minute + c + bytes([255]) + course_style + d +course_name + e + object_count + f))
         objs = []
         with open(cdt_path,'rb') as cdt:
             for i in range(2594):
@@ -92,8 +94,7 @@ with open(cdt_path,'rb') as cdt:
                 objs.append(object)
         objs = ''.join(objs)
         with open(home + '\Desktop\course_data_000.bcd','wb') as bcd:
-            bcd.seek(584)
-            bcd.write(bytes.fromhex(objs) + bytes(105076))
+            buffer.append(bytes.hex(bytes.fromhex(objs) + bytes(105076)))
             print('Main File Data Conversion Completed!')
 
 cdt_path = filedialog.askopenfilename(initialdir = home + '/Desktop',title = "Select A Sub Super Mario Maker Course Data Table",filetypes = (("Course Data Table","*.cdt"),("All Files","*.*")))
@@ -146,6 +147,28 @@ with open(cdt_path,'rb') as cdt:
                 objs.append(object)
             objs = ''.join(objs)
             with open(home + '\Desktop\course_data_000.bcd','wb') as bcd:
-                bcd.seek(188716)
-                bcd.write(object_count + bytes(40) + bytes.fromhex(objs) + bytes(104856) + bytes.fromhex('B1D37F9DF9A2AF2D94C9538F1FA81928F9A2AF2DB1D37F9D1FA8192894C9538F13D88EE8BD403CB0132EE15B655EEE3E'))
+                buffer.append(bytes.hex(object_count + bytes(40) + bytes.fromhex(objs) + bytes(104856) + bytes.fromhex('B1D37F9DF9A2AF2D94C9538F1FA81928F9A2AF2DB1D37F9D1FA8192894C9538F13D88EE8BD403CB0132EE15B655EEE3E')))
+                bcd.seek(0)
+                buffer = ''.join(buffer)
+                buffer = bytes.fromhex(buffer)
+                bcd.write(buffer)
                 print('Sub File Data Conversion Completed!')
+
+# fixes CRC32 Checksum
+def fixLevel(data):
+    crc = binascii.crc32(data[16:]) & 0xFFFFFFFF
+    data = bytearray(data)
+    data[8] = crc >> 24
+    data[9] = (crc >> 16) & 0xFF
+    data[10] = (crc >> 8) & 0xFF
+    data[11] = crc & 0xFF
+    return bytes(data)
+
+def main():
+    with open(home + '\Desktop\course_data_000.bcd', 'rb') as f:
+        data = f.read()
+    with open(home + '\Desktop\course_data_000.bcd', 'wb') as f:
+        f.write(fixLevel(data))
+        print('CRC32 Corrected Successfully!')
+
+main()
