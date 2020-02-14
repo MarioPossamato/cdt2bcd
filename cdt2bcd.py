@@ -93,7 +93,5 @@ with open(cdt_path,'rb') as cdt:
         objs = ''.join(objs)
         with open(home + '\Desktop\course_data_000.bcd','wb') as bcd:
             bcd.seek(584)
-            bcd.write(bytes.fromhex(objs))
-            bcd.seek(83592)
-            bcd.write(bytes(293128) + bytes.fromhex('B1D37F9DF9A2AF2D94C9538F1FA81928F9A2AF2DB1D37F9D1FA8192894C9538F13D88EE8BD403CB0132EE15B655EEE3E'))
+            bcd.write(bytes.fromhex(objs) + bytes(105076) + bytes.fromhex('B1D37F9DF9A2AF2D94C9538F1FA81928F9A2AF2DB1D37F9D1FA8192894C9538F13D88EE8BD403CB0132EE15B655EEE3E'))
             print('Completed!')
