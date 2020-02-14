@@ -20,5 +20,4 @@ On `Linux`, open the console and run `python3 path_to_cdt2bcd.py`
 [My Discord Server](https://discord.gg/8wx8uQF)
 
 ## Who gets credit for this?
-- Mario Possamato for cdt2bcd# cdt2bcd
-A Highly Experimental Super Mario Maker 1 To Super Mario Maker 2 Course Converter
+- Mario Possamato for cdt2bcd
