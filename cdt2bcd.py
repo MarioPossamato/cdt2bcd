@@ -1,12 +1,8 @@
-import tkinter, os, os.path, binascii
-from tkinter import filedialog
+import os, os.path, binascii
 
 buffer = []
 
-root = tkinter.Tk()
-root.withdraw()
-home = os.path.expanduser("~")
-cdt_path = filedialog.askopenfilename(initialdir = home + '/Desktop',title = "Select A Main Super Mario Maker Course Data Table",filetypes = (("Course Data Table","*.cdt"),("All Files","*.*")))
+cdt_path = QtWidgets.QFileDialog.getOpenFileName(self, "Open Super Mario Maker Course", '', ' Course Data File (*.cdt)')[0]
 with open(cdt_path,'rb') as cdt:
     cdt.seek(283)
     start_y = cdt.read(1)
