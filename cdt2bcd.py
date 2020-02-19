@@ -158,10 +158,10 @@ with open(cdt_path,'rb') as cdt:
 def fixLevel(data):
     crc = binascii.crc32(data[16:]) & 0xFFFFFFFF
     data = bytearray(data)
-    data[8] = crc >> 24
-    data[9] = (crc >> 16) & 0xFF
-    data[10] = (crc >> 8) & 0xFF
     data[11] = crc & 0xFF
+    data[10] = (crc >> 8) & 0xFF
+    data[9] = (crc >> 16) & 0xFF
+    data[8] = crc >> 24
     return bytes(data)
 
 def main():
