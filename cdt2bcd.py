@@ -95,7 +95,9 @@ with open(main_area_cdt,'rb') as main_cdt:
     object_count = bytes(object_count)
     main_area_buffer.append(bytes.hex(object_count))
     # sound effect count, snake block count, clear pipe count, piranha creeper count, ! block count, padding, tile count, track count, icicle count
-    main_area_buffer.append(bytes.hex(bytes(24)))
+    main_area_buffer.append(bytes.hex(bytes(28)))
+    main_area_buffer.append('9999')
+    main_area_buffer.append(bytes.hex(bytes(10)))
     # object data
     for i in range(2600):
         # x position
@@ -173,8 +175,10 @@ with open(main_area_cdt,'rb') as main_cdt:
         child_object_transformation_id = bytes.hex(child_object_transformation_id)
         object_data_buffer = (x_position+y_position+padding+width+height+object_flags+child_object_flags+extended_object_data+object_type+child_object_type+link_id+effect_index+unknown+child_object_transformation_id)
         main_area_buffer.append(object_data_buffer)
-    
+
+    # turn type(main_area_buffer) from list to string
     main_area_buffer = ''.join(main_area_buffer)
+    # open output bcd and write main_area_buffer
     with open(output_bcd,'wb') as output_bcd:
         output_bcd.write(bytes.fromhex(main_area_buffer))
 
