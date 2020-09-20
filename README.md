@@ -14,7 +14,6 @@ Update 7/16/2020: I started to rewrite this script (to clean up code, add more c
 ```usage: python3 cdt2bcd.py <main_area_input> <sub_area_input> <flag> <bcd_output>```  
 ```flag -d: does not encrypt the output bcd before it has been written out```  
 ```flag -e: encrypts the output bcd before it has been written out```  
-```if <bcd_output> is @default, cdt2bcd will write the output bcd to //default_course_data_000.bcd```
 
 ## Where do I get help/support?
 [My Discord Server](https://discord.gg/8wx8uQF)
