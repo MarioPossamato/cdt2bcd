@@ -13,62 +13,90 @@ import sys             # Built-in module
 import os              # Built-in module
 import io              # Built-in module
 import Encryption
+from SMM2 import encryption
+from SMM2 import keytables
+from SMM2 import streams
 #====================================#
 # Super Mario Maker Course
 class SuperMarioMaker1Course(dict):
-    def __init__(self):
-        pass
-    class Sprite(dict):
-        def __init__(self):
-            pass
-        def Load(self, data):
-            self['SpritePositionXAxis'] = data[0x0:0x4]           #==== Sprite X Position ====#
-            self['SpritePositionZAxis'] = data[0x4:0x8]           #==== Sprite Z Position ====#
-            self['SpritePositionYAxis'] = data[0x8:0xa]           #==== Sprite Y Position ====#
-            self['SpriteWidth'] = data[0xa:0xb]                   #==== Sprite Width ====#
-            self['SpriteHeight'] = data[0xb:0xc]                  #==== Sprite Height ====#
-            self['ParentSpriteFlags'] = data[0xc:0x10]            #==== Parent Sprite Flags ====#
-            self['ChildSpriteFlags'] = data[0x10:0x14]            #==== Child Sprite Flags ====#
-            self['ExtendedSpriteData'] = data[0x14:0x18]          #==== Extended Sprite Data ====#
-            self['ParentSpriteType'] = data[0x18:0x19]            #==== Parent Sprite Type ====#
-            self['ChildSpriteType'] = data[0x19:0x1a]             #==== Child Sprite Type ====#
-            self['SpriteLinkID'] = data[0x1a:0x1c]                #==== Sprite Link ID ====#
-            self['SpriteEffectIndex'] = data[0x1c:0x1e]           #==== Sprite Effect Index ====#
-            self['ChildSpriteTransformationID'] = data[0x1f:0x20] #==== Child Sprite Transformation ID ====#
-    def Load(self, data):
-        self.bs = io.BytesIO(data)
-        self.bs.seek(0x11b) #==== Start Y Axis ====#
-        self["StartYAxis"]    = self.bs.read(1)
-        self.bs.seek(0x15b) #==== Goal Y Axis ====#
-        self["GoalYAxis"]     = self.bs.read(1)
-        self.bs.seek(0x159) #==== Goal X Axis ====#
-        self["GoalXAxis"]     = self.bs.read(2)
-        self.bs.seek(0x70)  #==== Time Limit ====#
-        self["TimeLimit"]      = self.bs.read(2)
-        self.bs.seek(0x10)  #==== Creation Year, Month, Day, Hour and Minute ====#
-        self["CreationYear"]   = self.bs.read(2)
-        self["CreationMonth"]  = self.bs.read(1)
-        self["CreationDay"]    = self.bs.read(1)
-        self["CreationHour"]   = self.bs.read(1)
-        self["CreationMinute"] = self.bs.read(1)
-        self.bs.seek(0x6a)  #==== Game Style ====#
-        self["GameStyle"]      = self.bs.read(3)
-        self.bs.seek(0x29)  #==== Course Name ====#
-        self["CourseName"]     = self.bs.read(64)
-        self.bs.seek(0x6d)  #==== Course Theme ====#
-        self["CourseTheme"]    = self.bs.read(1)
-        self.bs.seek(0x72)  #==== Autoscroll ====#
-        self["Autoscroll"]      = self.bs.read(1)
-        self.bs.seek(0xec)  #==== Sprite Count ====#
-        self["SpriteCount"]    = self.bs.read(4)
-        for i in range(2600):         #==== Read Sprites ====#
-            self.bs.seek(0xF0+32*i)
-            self['Sprite '+str(i)] = self.Sprite()
-            self['Sprite '+str(i)].Load(self.bs.read(32))
+    def __init__(self, data=None):
+        if not data:
+            return None
+        else:
+            self.load(data)
+
+    def load(self, data=None):
+        if not data:
+            return None
+        else:
+            self.data = data
+            stream = streams.StreamIn(self.data)
+            stream.seek(0x11b) #==== Start Y Axis ====#
+            self["StartYAxis"]     = stream.read(1)
+            stream.seek(0x15b) #==== Goal Y Axis ====#
+            self["GoalYAxis"]      = stream.read(1)
+            stream.seek(0x159) #==== Goal X Axis ====#
+            self["GoalXAxis"]      = stream.read(2)
+            stream.seek(0x70)  #==== Time Limit ====#
+            self["TimeLimit"]      = stream.read(2)
+            stream.seek(0x10)  #==== Saved Year, Month, Day, Hour and Minute ====#
+            self["SavedYear"]      = stream.read(2)
+            self["SavedMonth"]     = stream.read(1)
+            self["SavedDay"]       = stream.read(1)
+            self["SavedHour"]      = stream.read(1)
+            self["SavedMinute"]    = stream.read(1)
+            stream.seek(0x6a)  #==== Game Style ====#
+            self["GameStyle"]      = stream.read(3)
+            stream.seek(0x29)  #==== Course Name ====#
+            self["CourseName"]     = stream.read(64)
+            stream.seek(0x6d)  #==== Course Theme ====#
+            self["CourseTheme"]    = stream.read(1)
+            stream.seek(0x72)  #==== Autoscroll ====#
+            self["Autoscroll"]     = stream.read(1)
+            stream.seek(0xec)  #==== Sprite Count ====#
+            self["SpriteCount"]    = stream.read(4)
+            for i in range(2600):         #==== Read Sprites ====#
+                stream.seek(0xF0+32*i)
+                self['Sprite '+str(i)] = self.Sprite()
+                self['Sprite '+str(i)].Load(stream.read(32))
+
+        class Sprite(dict):
+            def __init__(self, data=None):
+                if not data:
+                    return None
+                else:
+                    self.load(data)
+            def load(self, data=None):
+                if not data:
+                    return None
+                else:
+                    self.data = data
+                    self.stream = streams.StreamIn(self.data)
+                    self['SpritePositionXAxis'] = self.stream.readUInt32()        #==== Sprite X Position ====#
+                    self['SpritePositionZAxis'] = self.stream.readUInt32()        #==== Sprite Z Position ====#
+                    self['SpritePositionYAxis'] = self.stream.readUInt16()        #==== Sprite Y Position ====#
+                    self['SpriteWidth'] = self.stream.readUInt8()                 #==== Sprite Width ====#
+                    self['SpriteHeight'] = self.stream.readUInt8()                #==== Sprite Height ====#
+                    self['ParentSpriteFlags'] = self.stream.readBytes(0x4)        #==== Parent Sprite Flags ====#
+                    self['ChildSpriteFlags'] = self.stream.readBytes(0x4)         #==== Child Sprite Flags ====#
+                    self['ExtendedSpriteData'] = self.stream.readBytes(0x4)       #==== Extended Sprite Data ====#
+                    self['ParentSpriteType'] = self.stream.readUInt8()            #==== Parent Sprite Type ====#
+                    self['ChildSpriteType'] = self.stream.readUInt8()             #==== Child Sprite Type ====#
+                    self['SpriteLinkID'] = self.stream.readUInt16()               #==== Sprite Link ID ====#
+                    self['SpriteEffectIndex'] = self.stream.readUInt16()          #==== Sprite Effect Index ====#
+                    self.stream.skip(0x1)                                         #==== Unknown ====#
+                    self['ChildSpriteTransformationID'] = self.stream.readUInt8() #==== Child Sprite Transformation ID ====#
 
 #==== Super Mario Maker 2 Course ====#
 class SuperMarioMaker2Course(dict):
-    def __init__(self):
-        pass
-    def load(self, q):
-        return
+    def __init__(self, data=None):
+        if not data:
+            return None
+        else:
+            self.load(data)
+    def load(self, data=None):
+        if not data:
+            return None
+        else:
+            self.data = data
+            self.stream = streams.StreamIn(self.data)
